@@ -42,7 +42,9 @@ class State:
         return legal_moves
 
     def move(self, piece: 'Piece', move: 'Moves'):
+        self.board.matrix[piece.y][piece.x] = None
         piece.y, piece.x = self.next_coordinates(piece, move)
+        self.board.matrix[piece.y][piece.x] = piece
 
     def is_empty_cell(self, y, x):
         if self.board.matrix[y][x] == None:
@@ -65,13 +67,13 @@ class State:
     def successor(self) -> List['State']:
         next_states = list()
         for piece in self.board.pieces:
-            if piece.color == self.turn:
-                for legal_move in self.legal_moves(piece):
-                    newState = copy.deepcopy(self)
-                    newState.move(piece, legal_move)
-                    if newState.turn is Player.BLACK:
-                        newState.turn = Player.WHITE
-                    else:
-                        newState.turn = Player.BLACK
-                    next_states.append(newState)
+            for legal_move in self.legal_moves(piece):
+                newState = copy.deepcopy(self)
+                newPiece = copy.deepcopy(piece)
+                newState.move(newPiece, legal_move)
+                if newState.turn is Player.BLACK:
+                    newState.turn = Player.WHITE
+                else:
+                    newState.turn = Player.BLACK
+                next_states.append(newState)
         return next_states
