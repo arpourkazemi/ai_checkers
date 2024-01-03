@@ -1,7 +1,9 @@
 class Piece:
-    def __init__(self, color, king=False):
+    def __init__(self, color, y, x, isKing=False):
         self.color = color
-        self.king = king
+        self.isKing = isKing
+        self.y = y
+        self.x = x
 
     def crown(self):
         self.king = True
