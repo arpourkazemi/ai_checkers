@@ -12,46 +12,104 @@ class State:
         self.turn = Player.WHITE
 
     def print(self):
-        print("  " + ((8*4+1)*"-"))
+        print("  " + ((12*4+1)*"-"))
         for i in range(8):
             print(f"  ", end='')
             for j in range(8):
                 if (self.board.matrix[i][j]):
                     if (self.board.matrix[i][j].color == Player.WHITE):
-                        print(f"| {'w'} ", end='')
+                        print("| w", end='')
+                        print(str(self.board.matrix[i][j].id) + " ", end='')
+                        if self.board.matrix[i][j].id < 10:
+                            print(" ", end="")
                     if (self.board.matrix[i][j].color == Player.BLACK):
-                        print(f"| {'b'} ", end='')
+                        print("| b", end='')
+                        print(str(self.board.matrix[i][j].id) + " ", end='')
+                        if self.board.matrix[i][j].id < 10:
+                            print(" ", end="")
                 else:
-                    print(f"| {' '} ", end='')
+                    print(f"| {'   '} ", end='')
             print("| ")
-            print("  " + ((8*4+1)*"-"))
+            print("  " + ((12*4+1)*"-"))
 
     def legal_moves(self, piece: 'Piece'):
         legal_moves = list()
         for attr, move in vars(moves).items():
-            if self.is_in_board(piece, move):
+            if self.is_move_in_board(piece, move):
                 if not piece.isKing:
-                    if self.turn == Player.BLACK:
+                    if self.turn == Player.BLACK and piece.color == Player.BLACK:
                         if move == moves.TL or move == moves.TR:
-                            if self.is_empty_cell(self.next_coordinates(piece, move)[0], self.next_coordinates(piece, move)[1]):
+                            next_coordinates_y, next_coordinates_x = self.next_coordinates(
+                                piece, move)
+                            if self.is_empty_cell(next_coordinates_y, next_coordinates_x):
                                 legal_moves.append(move)
-                    if self.turn == Player.WHITE:
+                    if self.turn == Player.WHITE and piece.color == Player.WHITE:
                         if move == moves.BL or move == moves.BR:
-                            if self.is_empty_cell(self.next_coordinates(piece, move)[0], self.next_coordinates(piece, move)[1]):
+                            next_coordinates_y, next_coordinates_x = self.next_coordinates(
+                                piece, move)
+                            if self.is_empty_cell(next_coordinates_y, next_coordinates_x):
                                 legal_moves.append(move)
         return legal_moves
+
+    def legal_attacks(self, piece: 'Piece'):
+        legal_attacks = list()
+        for attr, attack in vars(moves).items():
+            if self.is_move_in_board(piece, attack):
+                if not piece.isKing:
+                    if self.turn == Player.BLACK and piece.color == Player.BLACK:
+                        if attack == moves.TL or attack == moves.TR:
+                            next_coordinates_y, next_coordinates_x = self.next_coordinates(
+                                piece, attack)
+                            if self.is_opponent(next_coordinates_y, next_coordinates_x, piece.color):
+                                next_next_y = next_coordinates_y + attack[0]
+                                next_next_x = next_coordinates_x + attack[1]
+                                if self.is_in_board(next_next_y, next_next_x) and self.is_empty_cell(next_next_y, next_next_x):
+                                    legal_attacks.append(attack)
+                    if self.turn == Player.WHITE and piece.color == Player.WHITE:
+                        if attack == moves.BL or attack == moves.BR:
+                            next_coordinates_y, next_coordinates_x = self.next_coordinates(
+                                piece, attack)
+                            if self.is_opponent(next_coordinates_y, next_coordinates_x, piece.color):
+                                next_next_y = next_coordinates_y + attack[0]
+                                next_next_x = next_coordinates_x + attack[1]
+                                if self.is_in_board(next_next_y, next_next_x) and self.is_empty_cell(next_next_y, next_next_x):
+                                    legal_attacks.append(attack)
+        return legal_attacks
 
     def move(self, piece: 'Piece', move: 'Moves'):
         self.board.matrix[piece.y][piece.x] = None
         piece.y, piece.x = self.next_coordinates(piece, move)
         self.board.matrix[piece.y][piece.x] = piece
 
+    def attack(self, piece: 'Piece', move: 'Moves'):
+        new_y = piece.y + 2 * move[0]
+        new_x = piece.x + 2 * move[1]
+        opponent = self.board.matrix[piece.y + move[0]][piece.x + move[1]]
+        for p in self.board.pieces:
+            if p.id == opponent.id and p.color == opponent.color:
+                self.board.pieces.remove(p)
+        self.board.matrix[piece.y][piece.x] = None
+        self.board.matrix[piece.y + move[0]][piece.x + move[1]] = None
+        self.board.matrix[new_y][new_x] = piece
+        piece.y = new_y
+        piece.x = new_x
+
     def is_empty_cell(self, y, x):
         if self.board.matrix[y][x] == None:
             return True
         return False
 
-    def is_in_board(self, piece: 'Piece', move: 'Moves'):
+    def is_opponent(self, y, x, color):
+        if not self.board.matrix[y][x] == None and self.board.matrix[y][x].color != color:
+            return True
+        return False
+
+    def is_in_board(self, y, x):
+        if x >= 0 and x < 8 and y >= 0 and y < 8:
+            return True
+        return False
+
+    def is_move_in_board(self, piece: 'Piece', move: 'Moves'):
         next_x, next_y = self.next_coordinates(piece, move)
         if next_x >= 0 and next_x < 8 and next_y >= 0 and next_y < 8:
             return True
@@ -67,13 +125,26 @@ class State:
     def successor(self) -> List['State']:
         next_states = list()
         for piece in self.board.pieces:
-            for legal_move in self.legal_moves(piece):
+            for legal_attack in self.legal_attacks(piece):
                 newState = copy.deepcopy(self)
-                newPiece = copy.deepcopy(piece)
-                newState.move(newPiece, legal_move)
-                if newState.turn is Player.BLACK:
+                for new_piece in newState.board.pieces:
+                    if new_piece.color == piece.color and new_piece.id == piece.id:
+                        newState.attack(new_piece, legal_attack)
+                if self.turn == Player.BLACK:
                     newState.turn = Player.WHITE
                 else:
                     newState.turn = Player.BLACK
                 next_states.append(newState)
+        if len(next_states) == 0:
+            for piece in self.board.pieces:
+                for legal_attack in self.legal_moves(piece):
+                    newState = copy.deepcopy(self)
+                    for new_piece in newState.board.pieces:
+                        if new_piece.color == piece.color and new_piece.id == piece.id:
+                            newState.move(new_piece, legal_attack)
+                    if self.turn == Player.BLACK:
+                        newState.turn = Player.WHITE
+                    else:
+                        newState.turn = Player.BLACK
+                    next_states.append(newState)
         return next_states
