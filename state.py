@@ -10,6 +10,8 @@ class State:
     def __init__(self):
         self.board = Board()
         self.turn = Player.WHITE
+        self.white_pieces = 12
+        self.black_pieces = 12
 
     def print(self):
         print("  " + ((12*4+1)*"-"))
@@ -127,6 +129,10 @@ class State:
         self.board.matrix[new_y][new_x] = piece
         piece.y = new_y
         piece.x = new_x
+        if piece.color == Player.BLACK:
+            self.white_pieces -= 1
+        else:
+            self.black_pieces -= 1
         if (piece.color == Player.BLACK and piece.y == 0) or (piece.color == Player.WHITE and piece.y == 7):
             piece.crown()
 
@@ -196,3 +202,4 @@ class State:
                 if piece.isKing:
                     utility -= 1
                 utility -= 1
+        return utility
