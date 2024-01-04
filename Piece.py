@@ -7,4 +7,4 @@ class Piece:
         self.id = id
 
     def crown(self):
-        self.king = True
+        self.isKing = True

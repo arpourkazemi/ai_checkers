@@ -17,16 +17,20 @@ class State:
             print(f"  ", end='')
             for j in range(8):
                 if (self.board.matrix[i][j]):
+                    print("| ", end='')
+                    if (self.board.matrix[i][j].isKing):
+                        print('\033[32m', end='')
                     if (self.board.matrix[i][j].color == Player.WHITE):
-                        print("| w", end='')
+                        print("w", end='')
                         print(str(self.board.matrix[i][j].id) + " ", end='')
                         if self.board.matrix[i][j].id < 10:
                             print(" ", end="")
                     if (self.board.matrix[i][j].color == Player.BLACK):
-                        print("| b", end='')
+                        print("b", end='')
                         print(str(self.board.matrix[i][j].id) + " ", end='')
                         if self.board.matrix[i][j].id < 10:
                             print(" ", end="")
+                    print('\033[m', end='')
                 else:
                     print(f"| {'   '} ", end='')
             print("| ")
@@ -49,6 +53,17 @@ class State:
                                 piece, move)
                             if self.is_empty_cell(next_coordinates_y, next_coordinates_x):
                                 legal_moves.append(move)
+                else:
+                    if self.turn == Player.BLACK and piece.color == Player.BLACK:
+                        next_coordinates_y, next_coordinates_x = self.next_coordinates(
+                            piece, move)
+                        if self.is_empty_cell(next_coordinates_y, next_coordinates_x):
+                            legal_moves.append(move)
+                    if self.turn == Player.WHITE and piece.color == Player.WHITE:
+                        next_coordinates_y, next_coordinates_x = self.next_coordinates(
+                            piece, move)
+                        if self.is_empty_cell(next_coordinates_y, next_coordinates_x):
+                            legal_moves.append(move)
         return legal_moves
 
     def legal_attacks(self, piece: 'Piece'):
@@ -74,12 +89,31 @@ class State:
                                 next_next_x = next_coordinates_x + attack[1]
                                 if self.is_in_board(next_next_y, next_next_x) and self.is_empty_cell(next_next_y, next_next_x):
                                     legal_attacks.append(attack)
+                else:
+                    if self.turn == Player.BLACK and piece.color == Player.BLACK:
+                        next_coordinates_y, next_coordinates_x = self.next_coordinates(
+                            piece, attack)
+                        if self.is_opponent(next_coordinates_y, next_coordinates_x, piece.color):
+                            next_next_y = next_coordinates_y + attack[0]
+                            next_next_x = next_coordinates_x + attack[1]
+                            if self.is_in_board(next_next_y, next_next_x) and self.is_empty_cell(next_next_y, next_next_x):
+                                legal_attacks.append(attack)
+                    if self.turn == Player.WHITE and piece.color == Player.WHITE:
+                        next_coordinates_y, next_coordinates_x = self.next_coordinates(
+                            piece, attack)
+                        if self.is_opponent(next_coordinates_y, next_coordinates_x, piece.color):
+                            next_next_y = next_coordinates_y + attack[0]
+                            next_next_x = next_coordinates_x + attack[1]
+                            if self.is_in_board(next_next_y, next_next_x) and self.is_empty_cell(next_next_y, next_next_x):
+                                legal_attacks.append(attack)
         return legal_attacks
 
     def move(self, piece: 'Piece', move: 'Moves'):
         self.board.matrix[piece.y][piece.x] = None
         piece.y, piece.x = self.next_coordinates(piece, move)
         self.board.matrix[piece.y][piece.x] = piece
+        if (piece.color == Player.BLACK and piece.y == 0) or (piece.color == Player.WHITE and piece.y == 7):
+            piece.crown()
 
     def attack(self, piece: 'Piece', move: 'Moves'):
         new_y = piece.y + 2 * move[0]
@@ -93,6 +127,8 @@ class State:
         self.board.matrix[new_y][new_x] = piece
         piece.y = new_y
         piece.x = new_x
+        if (piece.color == Player.BLACK and piece.y == 0) or (piece.color == Player.WHITE and piece.y == 7):
+            piece.crown()
 
     def is_empty_cell(self, y, x):
         if self.board.matrix[y][x] == None:
