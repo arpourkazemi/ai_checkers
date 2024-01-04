@@ -184,3 +184,15 @@ class State:
                         newState.turn = Player.BLACK
                     next_states.append(newState)
         return next_states
+
+    def heuristic(self, player: 'Player'):
+        utility = 0
+        for piece in self.board.pieces:
+            if piece.color == player:
+                if piece.isKing:
+                    utility += 1
+                utility += 1
+            else:
+                if piece.isKing:
+                    utility -= 1
+                utility -= 1
