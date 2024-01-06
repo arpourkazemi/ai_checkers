@@ -12,6 +12,8 @@ class State:
         self.turn = Player.WHITE
         self.white_pieces = 12
         self.black_pieces = 12
+        self.last_move = ''
+        self.last_piece_moved = ''
 
     def print(self):
         circled = ["🅐", "🅑", "🅒", "🅓", "🅔", "🅕", "🅖", "🅗", "🅘", "🅙", "🅚", "🅛"]
@@ -120,6 +122,8 @@ class State:
         self.board.matrix[piece.y][piece.x] = None
         piece.y, piece.x = self.next_coordinates(piece, move)
         self.board.matrix[piece.y][piece.x] = piece
+        self.last_piece_moved = piece.id
+        self.last_move = move
         if (piece.color == Player.BLACK and piece.y == 0) or (piece.color == Player.WHITE and piece.y == 7):
             piece.crown()
 
@@ -139,6 +143,8 @@ class State:
             self.white_pieces -= 1
         else:
             self.black_pieces -= 1
+        self.last_piece_moved = piece.id
+        self.last_move = move
         if (piece.color == Player.BLACK and piece.y == 0) or (piece.color == Player.WHITE and piece.y == 7):
             piece.crown()
 
@@ -175,21 +181,25 @@ class State:
         for piece in self.board.pieces:
             for legal_attack in self.legal_attacks(piece):
                 newState = copy.deepcopy(self)
+                change_turn = True
                 for new_piece in newState.board.pieces:
                     if new_piece.color == piece.color and new_piece.id == piece.id:
                         newState.attack(new_piece, legal_attack)
-                if self.turn == Player.BLACK:
-                    newState.turn = Player.WHITE
-                else:
-                    newState.turn = Player.BLACK
+                        if len(newState.legal_attacks(new_piece)) != 0:
+                            change_turn = False
+                if change_turn:
+                    if self.turn == Player.BLACK:
+                        newState.turn = Player.WHITE
+                    else:
+                        newState.turn = Player.BLACK
                 next_states.append(newState)
         if len(next_states) == 0:
             for piece in self.board.pieces:
-                for legal_attack in self.legal_moves(piece):
+                for legal_move in self.legal_moves(piece):
                     newState = copy.deepcopy(self)
                     for new_piece in newState.board.pieces:
                         if new_piece.color == piece.color and new_piece.id == piece.id:
-                            newState.move(new_piece, legal_attack)
+                            newState.move(new_piece, legal_move)
                     if self.turn == Player.BLACK:
                         newState.turn = Player.WHITE
                     else:
