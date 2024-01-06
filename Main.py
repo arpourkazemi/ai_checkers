@@ -5,13 +5,28 @@ from Player import Player
 n_bots = int(input("Enter number of bots:"))
 
 
+def print_bot_move_details(state: 'State'):
+    print("bot moved piece " +
+          chr(state.last_piece_moved + 65) + " to ", end="")
+    if state.last_move == (-1, -1):
+        print("top left")
+    elif state.last_move == (-1, 1):
+        print("top right")
+    elif state.last_move == (1, -1):
+        print("bottom right")
+    elif state.last_move == (1, 1):
+        print("bottom left")
+    print()
+    state.print()
+
+
 if n_bots == 0:
-    first_player_state = State()
+    red_state = State()
     want_to_exit = False
     while (True):
         print()
-        first_player_state.print()
-        print("It's red's turn" if first_player_state.turn ==
+        red_state.print()
+        print("It's red's turn" if red_state.turn ==
               Player.WHITE else "It's blue's turn")
         print("input a piece id and move in form of 'id' 'q|r|z|c'")
         while True:
@@ -31,9 +46,9 @@ if n_bots == 0:
                 elif selected_move == "c":
                     selected_move = (1, 1)
                 is_valid_move = False
-                for successor in first_player_state.successor():
+                for successor in red_state.successor():
                     if successor.last_piece_moved == selected_piece_id and successor.last_move == selected_move:
-                        first_player_state = successor
+                        red_state = successor
                         is_valid_move = True
                         break
                 if not is_valid_move:
@@ -45,24 +60,86 @@ if n_bots == 0:
                     exit(0)
                 else:
                     print("\033[31minvalid move! please try again.\033[0m")
-        if first_player_state.white_pieces == 0 or first_player_state.black_pieces == 0:
+        if red_state.white_pieces == 0 or red_state.black_pieces == 0:
+            break
+
+if n_bots == 1:
+    red_state = State()
+    want_to_exit = False
+    red_bot_strength = int(input("input white playes depth:"))
+    while True:
+        try:
+            if red_state.turn == Player.WHITE:
+                print()
+                red_state.print()
+                print("It's your turn - you are red!")
+                print("input a piece id and move in form of 'id' 'q|r|z|c'")
+                inp = input()
+                if inp == "exit":
+                    want_to_exit = True
+                    exit(0)
+                selected_piece_char, selected_move = inp.lower().split()
+                selected_piece_id = ord(selected_piece_char) - 97
+                if selected_move == "q":
+                    selected_move = (-1, -1)
+                elif selected_move == "e":
+                    selected_move = (-1, 1)
+                elif selected_move == "z":
+                    selected_move = (1, -1)
+                elif selected_move == "c":
+                    selected_move = (1, 1)
+                is_valid_move = False
+                for successor in red_state.successor():
+                    if successor.last_piece_moved == selected_piece_id and successor.last_move == selected_move:
+                        red_state = successor
+                        is_valid_move = True
+                        break
+                if not is_valid_move:
+                    print("here")
+                    print("\033[31minvalid move! please try again.\033[0m")
+            else:
+                print()
+                red_state.print()
+                MAX, MIN = 1000, -1000
+                red_state, new_v2 = minimax(
+                    red_state, 0, True, MIN, MAX, red_bot_strength)
+                print_bot_move_details(red_state)
+        except:
+            if want_to_exit:
+                exit(0)
+            else:
+                print("\033[31minvalid move! please try again.\033[0m")
+        if red_state.black_pieces == 0 or red_state.black_pieces == 0:
+            red_state.print()
+            if red_state.turn == Player.WHITE:
+                print("congratulations! You won the game!")
+            else:
+                print("you lost to our strong AI!")
             break
 
 
 if n_bots == 2:
     MAX, MIN = 1000, -1000
-    w_d = int(input("input white playes depth:"))
-    b_d = int(input("input black playes depth:"))
-    first_player_state = State()
-    first_player_state.print()
+    red_bot_strength = int(input("input red bot strength:"))
+    blue_bot_strength = int(input("input blue bot strength:"))
+    red_state = State()
+    red_state.print()
     while (True):
-        second_player_state, new_v2 = minimax(
-            first_player_state, 0, True, MIN, MAX, w_d)
-        second_player_state.print()
-        if second_player_state.white_pieces == 0 or second_player_state.black_pieces == 0:
+        blue_state, new_v2 = minimax(
+            red_state, 0, True, MIN, MAX, red_bot_strength)
+        print_bot_move_details(blue_state)
+        if blue_state.black_pieces == 0 or blue_state.black_pieces == 0:
+            if red_state.turn == Player.WHITE:
+                print("bot red won the game!")
+            else:
+                print("bot blue won the game!")
             break
-        first_player_state, new_v1 = minimax(
-            second_player_state, 0, True, MIN, MAX, b_d)
-        first_player_state.print()
-        if first_player_state.white_pieces == 0 or first_player_state.black_pieces == 0:
+        red_state, new_v1 = minimax(
+            blue_state, 0, True, MIN, MAX, blue_bot_strength)
+        print_bot_move_details(red_state)
+        if red_state.black_pieces == 0 or red_state.black_pieces == 0:
+            if red_state.turn == Player.WHITE:
+                print("bot red won the game!")
+            else:
+                print("bot blue won the game!")
             break
