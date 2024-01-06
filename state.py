@@ -14,29 +14,33 @@ class State:
         self.black_pieces = 12
 
     def print(self):
-        print("  " + ((12*4+1)*"-"))
         for i in range(8):
-            print(f"  ", end='')
-            for j in range(8):
-                if (self.board.matrix[i][j]):
-                    print("| ", end='')
-                    if (self.board.matrix[i][j].isKing):
-                        print('\033[32m', end='')
-                    if (self.board.matrix[i][j].color == Player.WHITE):
-                        print("w", end='')
-                        print(str(self.board.matrix[i][j].id) + " ", end='')
-                        if self.board.matrix[i][j].id < 10:
-                            print(" ", end="")
-                    if (self.board.matrix[i][j].color == Player.BLACK):
-                        print("b", end='')
-                        print(str(self.board.matrix[i][j].id) + " ", end='')
-                        if self.board.matrix[i][j].id < 10:
-                            print(" ", end="")
-                    print('\033[m', end='')
-                else:
-                    print(f"| {'   '} ", end='')
-            print("| ")
-            print("  " + ((12*4+1)*"-"))
+            for p in range(3):
+                print("  ", end='')
+                for j in range(8):
+                    if (i % 2 == 0 and j % 2 == 0) or (i % 2 == 1 and j % 2 == 1):
+                        print("\033[47m", end="")
+                    else:
+                        print("\033[40m", end="")
+                    if (self.board.matrix[i][j] and p == 1):
+                        if (self.board.matrix[i][j].color == Player.WHITE):
+                            if (self.board.matrix[i][j].isKing):
+                                print(
+                                    "\033[31m" + "  ◯  " + "\033[0m", end="")
+                            else:
+                                print(
+                                    "\033[31m" + "  ⬤  " + "\033[0m", end="")
+                        if (self.board.matrix[i][j].color == Player.BLACK):
+                            if (self.board.matrix[i][j].isKing):
+                                print(
+                                    "\033[34m" + "  ◯  " + "\033[0m", end="")
+                            else:
+                                print(
+                                    "\033[34m" + "  ⬤  " + "\033[0m", end="")
+                    else:
+                        print("     \033[0m", end="")
+                print("")
+        print(end="\n\n")
 
     def legal_moves(self, piece: 'Piece'):
         legal_moves = list()
