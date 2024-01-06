@@ -27,7 +27,7 @@ if n_bots == 0:
         print()
         red_state.print()
         print("It's red's turn" if red_state.turn ==
-              Player.WHITE else "It's blue's turn")
+              Player.RED else "It's blue's turn")
         print("input a piece id and move in form of 'id' 'q|r|z|c'")
         while True:
             try:
@@ -60,16 +60,22 @@ if n_bots == 0:
                     exit(0)
                 else:
                     print("\033[31minvalid move! please try again.\033[0m")
-        if red_state.white_pieces == 0 or red_state.black_pieces == 0:
+
+        if red_state.blue_pieces == 0 or red_state.red_pieces == 0:
+            red_state.print()
+            if red_state.turn == Player.RED:
+                print("player red won the game!")
+            else:
+                print("player red won the game!")
             break
 
 if n_bots == 1:
     red_state = State()
     want_to_exit = False
-    red_bot_strength = int(input("input white playes depth:"))
+    red_bot_strength = int(input("input bot strength:"))
     while True:
         try:
-            if red_state.turn == Player.WHITE:
+            if red_state.turn == Player.RED:
                 print()
                 red_state.print()
                 print("It's your turn - you are red!")
@@ -109,9 +115,9 @@ if n_bots == 1:
                 exit(0)
             else:
                 print("\033[31minvalid move! please try again.\033[0m")
-        if red_state.black_pieces == 0 or red_state.black_pieces == 0:
+        if red_state.blue_pieces == 0 or red_state.red_pieces == 0:
             red_state.print()
-            if red_state.turn == Player.WHITE:
+            if red_state.turn == Player.RED:
                 print("congratulations! You won the game!")
             else:
                 print("you lost to our strong AI!")
@@ -128,8 +134,8 @@ if n_bots == 2:
         blue_state, new_v2 = minimax(
             red_state, 0, True, MIN, MAX, red_bot_strength)
         print_bot_move_details(blue_state)
-        if blue_state.black_pieces == 0 or blue_state.black_pieces == 0:
-            if red_state.turn == Player.WHITE:
+        if blue_state.blue_pieces == 0 or blue_state.red_pieces == 0:
+            if red_state.turn == Player.RED:
                 print("bot red won the game!")
             else:
                 print("bot blue won the game!")
@@ -137,8 +143,8 @@ if n_bots == 2:
         red_state, new_v1 = minimax(
             blue_state, 0, True, MIN, MAX, blue_bot_strength)
         print_bot_move_details(red_state)
-        if red_state.black_pieces == 0 or red_state.black_pieces == 0:
-            if red_state.turn == Player.WHITE:
+        if red_state.blue_pieces == 0 or red_state.red_pieces == 0:
+            if red_state.turn == Player.RED:
                 print("bot red won the game!")
             else:
                 print("bot blue won the game!")

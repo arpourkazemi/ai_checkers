@@ -9,9 +9,9 @@ import copy
 class State:
     def __init__(self):
         self.board = Board()
-        self.turn = Player.WHITE
-        self.white_pieces = 12
-        self.black_pieces = 12
+        self.turn = Player.RED
+        self.red_pieces = 12
+        self.blue_pieces = 12
         self.last_move = ''
         self.last_piece_moved = ''
 
@@ -27,14 +27,14 @@ class State:
                     else:
                         print("\033[40m", end="")
                     if (self.board.matrix[i][j] and p == 1):
-                        if (self.board.matrix[i][j].color == Player.WHITE):
+                        if (self.board.matrix[i][j].color == Player.RED):
                             if (self.board.matrix[i][j].isKing):
                                 print(
                                     "\033[31m  " + circled[self.board.matrix[i][j].id] + "  \033[0m", end="")
                             else:
                                 print(
                                     "\033[31m  " + negative[self.board.matrix[i][j].id] + "  \033[0m", end="")
-                        if (self.board.matrix[i][j].color == Player.BLACK):
+                        if (self.board.matrix[i][j].color == Player.BLUE):
                             if (self.board.matrix[i][j].isKing):
                                 print(
                                     "\033[34m  " + circled[self.board.matrix[i][j].id] + "  \033[0m", end="")
@@ -51,25 +51,25 @@ class State:
         for attr, move in vars(moves).items():
             if self.is_move_in_board(piece, move):
                 if not piece.isKing:
-                    if self.turn == Player.BLACK and piece.color == Player.BLACK:
+                    if self.turn == Player.BLUE and piece.color == Player.BLUE:
                         if move == moves.TL or move == moves.TR:
                             next_coordinates_y, next_coordinates_x = self.next_coordinates(
                                 piece, move)
                             if self.is_empty_cell(next_coordinates_y, next_coordinates_x):
                                 legal_moves.append(move)
-                    if self.turn == Player.WHITE and piece.color == Player.WHITE:
+                    if self.turn == Player.RED and piece.color == Player.RED:
                         if move == moves.BL or move == moves.BR:
                             next_coordinates_y, next_coordinates_x = self.next_coordinates(
                                 piece, move)
                             if self.is_empty_cell(next_coordinates_y, next_coordinates_x):
                                 legal_moves.append(move)
                 else:
-                    if self.turn == Player.BLACK and piece.color == Player.BLACK:
+                    if self.turn == Player.BLUE and piece.color == Player.BLUE:
                         next_coordinates_y, next_coordinates_x = self.next_coordinates(
                             piece, move)
                         if self.is_empty_cell(next_coordinates_y, next_coordinates_x):
                             legal_moves.append(move)
-                    if self.turn == Player.WHITE and piece.color == Player.WHITE:
+                    if self.turn == Player.RED and piece.color == Player.RED:
                         next_coordinates_y, next_coordinates_x = self.next_coordinates(
                             piece, move)
                         if self.is_empty_cell(next_coordinates_y, next_coordinates_x):
@@ -81,7 +81,7 @@ class State:
         for attr, attack in vars(moves).items():
             if self.is_move_in_board(piece, attack):
                 if not piece.isKing:
-                    if self.turn == Player.BLACK and piece.color == Player.BLACK:
+                    if self.turn == Player.BLUE and piece.color == Player.BLUE:
                         if attack == moves.TL or attack == moves.TR:
                             next_coordinates_y, next_coordinates_x = self.next_coordinates(
                                 piece, attack)
@@ -90,7 +90,7 @@ class State:
                                 next_next_x = next_coordinates_x + attack[1]
                                 if self.is_in_board(next_next_y, next_next_x) and self.is_empty_cell(next_next_y, next_next_x):
                                     legal_attacks.append(attack)
-                    if self.turn == Player.WHITE and piece.color == Player.WHITE:
+                    if self.turn == Player.RED and piece.color == Player.RED:
                         if attack == moves.BL or attack == moves.BR:
                             next_coordinates_y, next_coordinates_x = self.next_coordinates(
                                 piece, attack)
@@ -100,7 +100,7 @@ class State:
                                 if self.is_in_board(next_next_y, next_next_x) and self.is_empty_cell(next_next_y, next_next_x):
                                     legal_attacks.append(attack)
                 else:
-                    if self.turn == Player.BLACK and piece.color == Player.BLACK:
+                    if self.turn == Player.BLUE and piece.color == Player.BLUE:
                         next_coordinates_y, next_coordinates_x = self.next_coordinates(
                             piece, attack)
                         if self.is_opponent(next_coordinates_y, next_coordinates_x, piece.color):
@@ -108,7 +108,7 @@ class State:
                             next_next_x = next_coordinates_x + attack[1]
                             if self.is_in_board(next_next_y, next_next_x) and self.is_empty_cell(next_next_y, next_next_x):
                                 legal_attacks.append(attack)
-                    if self.turn == Player.WHITE and piece.color == Player.WHITE:
+                    if self.turn == Player.RED and piece.color == Player.RED:
                         next_coordinates_y, next_coordinates_x = self.next_coordinates(
                             piece, attack)
                         if self.is_opponent(next_coordinates_y, next_coordinates_x, piece.color):
@@ -124,7 +124,7 @@ class State:
         self.board.matrix[piece.y][piece.x] = piece
         self.last_piece_moved = piece.id
         self.last_move = move
-        if (piece.color == Player.BLACK and piece.y == 0) or (piece.color == Player.WHITE and piece.y == 7):
+        if (piece.color == Player.BLUE and piece.y == 0) or (piece.color == Player.RED and piece.y == 7):
             piece.crown()
 
     def attack(self, piece: 'Piece', move: 'Moves'):
@@ -139,13 +139,13 @@ class State:
         self.board.matrix[new_y][new_x] = piece
         piece.y = new_y
         piece.x = new_x
-        if piece.color == Player.BLACK:
-            self.white_pieces -= 1
+        if piece.color == Player.BLUE:
+            self.red_pieces -= 1
         else:
-            self.black_pieces -= 1
+            self.blue_pieces -= 1
         self.last_piece_moved = piece.id
         self.last_move = move
-        if (piece.color == Player.BLACK and piece.y == 0) or (piece.color == Player.WHITE and piece.y == 7):
+        if (piece.color == Player.BLUE and piece.y == 0) or (piece.color == Player.RED and piece.y == 7):
             piece.crown()
 
     def is_empty_cell(self, y, x):
@@ -188,10 +188,10 @@ class State:
                         if len(newState.legal_attacks(new_piece)) != 0:
                             change_turn = False
                 if change_turn:
-                    if self.turn == Player.BLACK:
-                        newState.turn = Player.WHITE
+                    if self.turn == Player.BLUE:
+                        newState.turn = Player.RED
                     else:
-                        newState.turn = Player.BLACK
+                        newState.turn = Player.BLUE
                 next_states.append(newState)
         if len(next_states) == 0:
             for piece in self.board.pieces:
@@ -200,10 +200,10 @@ class State:
                     for new_piece in newState.board.pieces:
                         if new_piece.color == piece.color and new_piece.id == piece.id:
                             newState.move(new_piece, legal_move)
-                    if self.turn == Player.BLACK:
-                        newState.turn = Player.WHITE
+                    if self.turn == Player.BLUE:
+                        newState.turn = Player.RED
                     else:
-                        newState.turn = Player.BLACK
+                        newState.turn = Player.BLUE
                     next_states.append(newState)
         return next_states
 
