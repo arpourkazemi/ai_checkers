@@ -14,6 +14,8 @@ class State:
         self.black_pieces = 12
 
     def print(self):
+        circled = ["🅐", "🅑", "🅒", "🅓", "🅔", "🅕", "🅖", "🅗", "🅘", "🅙", "🅚", "🅛"]
+        negative = ["Ⓐ", "Ⓑ", "Ⓒ", "Ⓓ", "Ⓔ", "Ⓕ", "Ⓖ", "Ⓗ", "Ⓘ", "Ⓙ", "Ⓚ", "Ⓛ"]
         for i in range(8):
             for p in range(3):
                 print("  ", end='')
@@ -26,17 +28,17 @@ class State:
                         if (self.board.matrix[i][j].color == Player.WHITE):
                             if (self.board.matrix[i][j].isKing):
                                 print(
-                                    "\033[31m" + "  ◯  " + "\033[0m", end="")
+                                    "\033[31m  " + circled[self.board.matrix[i][j].id] + "  \033[0m", end="")
                             else:
                                 print(
-                                    "\033[31m" + "  ⬤  " + "\033[0m", end="")
+                                    "\033[31m  " + negative[self.board.matrix[i][j].id] + "  \033[0m", end="")
                         if (self.board.matrix[i][j].color == Player.BLACK):
                             if (self.board.matrix[i][j].isKing):
                                 print(
-                                    "\033[34m" + "  ◯  " + "\033[0m", end="")
+                                    "\033[34m  " + circled[self.board.matrix[i][j].id] + "  \033[0m", end="")
                             else:
                                 print(
-                                    "\033[34m" + "  ⬤  " + "\033[0m", end="")
+                                    "\033[34m  " + negative[self.board.matrix[i][j].id] + "  \033[0m", end="")
                     else:
                         print("     \033[0m", end="")
                 print("")
