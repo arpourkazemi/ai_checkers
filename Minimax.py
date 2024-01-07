@@ -4,10 +4,10 @@ import random
 MAX, MIN = 1000, -1000
 
 
-def minimax(state: 'State', depth, maximizingPlayer, alpha, beta, strength):
+def minimax(state: 'State', depth, maximizing_player, alpha, beta, strength):
     successors = state.successor()
     color: 'Color' = state.turn
-    if not maximizingPlayer:
+    if not maximizing_player:
         if state.turn == color.BLUE:
             color = color.RED
         else:
@@ -15,7 +15,7 @@ def minimax(state: 'State', depth, maximizingPlayer, alpha, beta, strength):
     if depth == strength:
         return state, state.heuristic(color)
 
-    if maximizingPlayer:
+    if maximizing_player:
         if len(successors) == 0:
             return state, state.heuristic(color)
         best = MIN
