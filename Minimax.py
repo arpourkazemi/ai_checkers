@@ -2,10 +2,18 @@ from state import State
 from Color import Color
 import random
 MAX, MIN = 1000, -1000
+BRANCHING_FACTOR = 4
+
+
+def get_heuristic(element):
+    return element.heuristic(element.turn)
 
 
 def minimax(state: 'State', depth, maximizing_player, alpha, beta, strength):
     successors = state.successor()
+    if len(successors) > BRANCHING_FACTOR:
+        successors.sort(key=get_heuristic, reverse=True)
+        successors = successors[:BRANCHING_FACTOR]
     color: 'Color' = state.turn
     if not maximizing_player:
         if state.turn == color.BLUE:
