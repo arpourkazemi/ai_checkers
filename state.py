@@ -28,14 +28,14 @@ class State:
                         print("\033[40m", end="")
                     if (self.board.matrix[i][j] and p == 1):
                         if (self.board.matrix[i][j].color == Color.RED):
-                            if (self.board.matrix[i][j].isKing):
+                            if (self.board.matrix[i][j].is_king):
                                 print(
                                     "\033[31m  " + circled[self.board.matrix[i][j].id] + "  \033[0m", end="")
                             else:
                                 print(
                                     "\033[31m  " + negative[self.board.matrix[i][j].id] + "  \033[0m", end="")
                         if (self.board.matrix[i][j].color == Color.BLUE):
-                            if (self.board.matrix[i][j].isKing):
+                            if (self.board.matrix[i][j].is_king):
                                 print(
                                     "\033[34m  " + circled[self.board.matrix[i][j].id] + "  \033[0m", end="")
                             else:
@@ -50,7 +50,7 @@ class State:
         legal_moves = list()
         for attr, move in vars(moves).items():
             if self.is_move_in_board(piece, move):
-                if not piece.isKing:
+                if not piece.is_king:
                     if self.turn == Color.BLUE and piece.color == Color.BLUE:
                         if move == moves.TL or move == moves.TR:
                             next_coordinates_y, next_coordinates_x = self.next_coordinates(
@@ -80,7 +80,7 @@ class State:
         legal_attacks = list()
         for attr, attack in vars(moves).items():
             if self.is_move_in_board(piece, attack):
-                if not piece.isKing:
+                if not piece.is_king:
                     if self.turn == Color.BLUE and piece.color == Color.BLUE:
                         if attack == moves.TL or attack == moves.TR:
                             next_coordinates_y, next_coordinates_x = self.next_coordinates(
@@ -180,42 +180,42 @@ class State:
         next_states = list()
         for piece in self.board.pieces:
             for legal_attack in self.legal_attacks(piece):
-                newState = copy.deepcopy(self)
+                new_state = copy.deepcopy(self)
                 change_turn = True
-                for new_piece in newState.board.pieces:
+                for new_piece in new_state.board.pieces:
                     if new_piece.color == piece.color and new_piece.id == piece.id:
-                        newState.attack(new_piece, legal_attack)
-                        if len(newState.legal_attacks(new_piece)) != 0:
+                        new_state.attack(new_piece, legal_attack)
+                        if len(new_state.legal_attacks(new_piece)) != 0:
                             change_turn = False
                 if change_turn:
                     if self.turn == Color.BLUE:
-                        newState.turn = Color.RED
+                        new_state.turn = Color.RED
                     else:
-                        newState.turn = Color.BLUE
-                next_states.append(newState)
+                        new_state.turn = Color.BLUE
+                next_states.append(new_state)
         if len(next_states) == 0:
             for piece in self.board.pieces:
                 for legal_move in self.legal_moves(piece):
-                    newState = copy.deepcopy(self)
-                    for new_piece in newState.board.pieces:
+                    new_state = copy.deepcopy(self)
+                    for new_piece in new_state.board.pieces:
                         if new_piece.color == piece.color and new_piece.id == piece.id:
-                            newState.move(new_piece, legal_move)
+                            new_state.move(new_piece, legal_move)
                     if self.turn == Color.BLUE:
-                        newState.turn = Color.RED
+                        new_state.turn = Color.RED
                     else:
-                        newState.turn = Color.BLUE
-                    next_states.append(newState)
+                        new_state.turn = Color.BLUE
+                    next_states.append(new_state)
         return next_states
 
     def heuristic(self, color: 'Color'):
         utility = 0
         for piece in self.board.pieces:
             if piece.color == color:
-                if piece.isKing:
+                if piece.is_king:
                     utility += 1
                 utility += 1
             else:
-                if piece.isKing:
+                if piece.is_king:
                     utility -= 1
                 utility -= 1
         return utility
