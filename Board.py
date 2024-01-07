@@ -1,5 +1,5 @@
 from Piece import Piece
-from Player import Player
+from Color import Color
 from typing import List
 
 
@@ -14,7 +14,7 @@ class Board:
         for y in range(3):
             for x in range(8):
                 if (((x % 2 == 0) and (y % 2 != 0)) or ((x % 2 != 0) and (y % 2 == 0))):
-                    newPiece = Piece(id, Player.RED, y, x)
+                    newPiece = Piece(id, Color.RED, y, x)
                     id += 1
                     self.pieces.append(newPiece)
                     matrix[y][x] = newPiece
@@ -22,7 +22,7 @@ class Board:
         for y in range(5, 8):
             for x in range(8):
                 if (((x % 2 == 0) and (y % 2 != 0)) or ((x % 2 != 0) and (y % 2 == 0))):
-                    newPiece = Piece(id, Player.BLUE, y, x)
+                    newPiece = Piece(id, Color.BLUE, y, x)
                     id += 1
                     self.pieces.append(newPiece)
                     matrix[y][x] = newPiece

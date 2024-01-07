@@ -1,22 +1,23 @@
 from state import State
+from Color import Color
 import random
 MAX, MIN = 1000, -1000
 
 
 def minimax(state: 'State', depth, maximizingPlayer, alpha, beta, strength):
     successors = state.successor()
-    player = state.turn
+    color: 'Color' = state.turn
     if not maximizingPlayer:
-        if state.turn == player.BLUE:
-            player = player.RED
+        if state.turn == color.BLUE:
+            color = color.RED
         else:
-            player = player.BLUE
+            color = color.BLUE
     if depth == strength:
-        return state, state.heuristic(player)
+        return state, state.heuristic(color)
 
     if maximizingPlayer:
         if len(successors) == 0:
-            return state, state.heuristic(player)
+            return state, state.heuristic(color)
         best = MIN
         best_state = successors[random.randint(0, len(successors) - 1)]
         for successor in successors:
@@ -34,7 +35,7 @@ def minimax(state: 'State', depth, maximizingPlayer, alpha, beta, strength):
 
     else:
         if len(successors) == 0:
-            return state, state.heuristic(player)
+            return state, state.heuristic(color)
         best = MAX
         best_state = successors[random.randint(0, len(successors) - 1)]
         for successor in successors:
