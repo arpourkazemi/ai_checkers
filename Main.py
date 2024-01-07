@@ -28,33 +28,34 @@ def check_end_game(state: 'State', blue_win_message="blue wins", red_win_message
 
 
 def player_move(state: 'State'):
-    try:
-        want_to_exit = False
-        inp = input()
-        if inp == "exit":
-            want_to_exit = True
-        selected_piece_char, selected_move = inp.lower().split()
-        selected_piece_id = ord(selected_piece_char) - 97
-        if selected_move == "q":
-            selected_move = (-1, -1)
-        elif selected_move == "e":
-            selected_move = (-1, 1)
-        elif selected_move == "z":
-            selected_move = (1, -1)
-        elif selected_move == "c":
-            selected_move = (1, 1)
-        is_valid_move = False
-        for successor in state.successor():
-            if successor.last_piece_moved == selected_piece_id and successor.last_move == selected_move:
-                is_valid_move = True
-                return successor
-        if not is_valid_move:
-            print("\033[31minvalid move! please try again.\033[0m")
-    except:
-        if want_to_exit:
-            exit(0)
-        else:
-            print("\033[31minvalid move! please try again.\033[0m")
+    while True:
+        try:
+            want_to_exit = False
+            inp = input()
+            if inp == "exit":
+                want_to_exit = True
+            selected_piece_char, selected_move = inp.lower().split()
+            selected_piece_id = ord(selected_piece_char) - 97
+            if selected_move == "q":
+                selected_move = (-1, -1)
+            elif selected_move == "e":
+                selected_move = (-1, 1)
+            elif selected_move == "z":
+                selected_move = (1, -1)
+            elif selected_move == "c":
+                selected_move = (1, 1)
+            is_valid_move = False
+            for successor in state.successor():
+                if successor.last_piece_moved == selected_piece_id and successor.last_move == selected_move:
+                    is_valid_move = True
+                    return successor
+            if not is_valid_move:
+                print("\033[31minvalid move! please try again.\033[0m")
+        except:
+            if want_to_exit:
+                exit(0)
+            else:
+                print("\033[31minvalid move! please try again.\033[0m")
 
 
 if n_bots == 0:
@@ -66,8 +67,11 @@ if n_bots == 0:
         check_end_game(state)
         print("It's red's turn" if state.turn ==
               Color.RED else "It's blue's turn")
-        print("input a piece id and move in form of 'id' 'q|r|z|c'")
+        print("input a piece id and move in form of 'id' 'q|e|z|c'")
         state = player_move(state)
+        while not state:
+            player_move(state)
+
 
 if n_bots == 1:
     state = State()
@@ -78,7 +82,7 @@ if n_bots == 1:
     while True:
         if state.turn == Color.RED:
             print("It's your turn - you are red!")
-            print("input a piece id and move in form of 'id' 'q|r|z|c'")
+            print("input a piece id and move in form of 'id' 'q|e|z|c'")
             state = player_move(state)
             print()
             state.print()
