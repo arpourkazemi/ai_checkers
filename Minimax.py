@@ -5,21 +5,15 @@ MAX, MIN = 1000, -1000
 BRANCHING_FACTOR = 4
 
 
-def get_heuristic(element):
+def get_heuristic(element: 'State'):
     return element.heuristic(element.turn)
 
 
-def minimax(state: 'State', depth, maximizing_player, alpha, beta, strength):
+def minimax(state: 'State', depth, maximizing_player, alpha, beta, strength, color):
     successors = state.successor()
     if len(successors) > BRANCHING_FACTOR:
-        successors.sort(key=get_heuristic, reverse=True)
+        successors.sort(key=get_heuristic)
         successors = successors[:BRANCHING_FACTOR]
-    color: 'Color' = state.turn
-    if not maximizing_player:
-        if state.turn == color.BLUE:
-            color = color.RED
-        else:
-            color = color.BLUE
     if depth == strength:
         return state, state.heuristic(color)
 
@@ -30,7 +24,7 @@ def minimax(state: 'State', depth, maximizing_player, alpha, beta, strength):
         best_state = successors[random.randint(0, len(successors) - 1)]
         for successor in successors:
             s, val = minimax(successor, depth + 1,
-                             False, alpha, beta, strength)
+                             False, alpha, beta, strength, color)
             best = max(best, val)
             if val > best:
                 best = val
@@ -48,7 +42,7 @@ def minimax(state: 'State', depth, maximizing_player, alpha, beta, strength):
         best_state = successors[random.randint(0, len(successors) - 1)]
         for successor in successors:
             s, val = minimax(successor, depth + 1,
-                             True, alpha, beta, strength)
+                             True, alpha, beta, strength, color)
             best = min(best, val)
             if val < best:
                 best = val

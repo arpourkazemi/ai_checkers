@@ -208,90 +208,24 @@ class State:
         return next_states
 
     def heuristic(self, color: 'Color'):
-        # Index 0: Number of pawns
-        # Index 1: Number of kings
-        # Index 2: Number in back row
-        # Index 3: Number in middle box
-        # Index 4: Number in middle 2 rows, not box
-        # Index 5: Number that can be taken this turn
-        # Index 6: Number that are protected
-        # Weights: [4, 8, 1, 2, 1.5, -3, 3]
-        utility_red = [0 for i in range(7)]
-        utility_blue = [0 for i in range(7)]
-        for i in range(8):
-            for j in range(8):
-                current_cell = self.board.matrix[i][j]
-                if current_cell != None:
-                    if current_cell.color == Color.RED:
-                        if current_cell.is_king:
-                            # king
-                            utility_red[1] += 1
-                        else:
-                            # pawn
-                            utility_red[0] += 1
+        utility_red = 0
+        utility_blue = 0
+        for piece in self.board.pieces:
+            if piece.color == Color.RED:
+                utility_red += 1
+                if piece.is_king:
+                    utility_red += 1
+                if self.turn == Color.RED and len(self.legal_attacks(piece)) != 0:
+                    utility_red += 2
 
-                        if i == 7:
-                            # back row
-                            utility_red[2] += 1
-                            utility_red[6] += 1
-                        elif i == 3 or i == 4:
-                            # mid box
-                            if j >= 2 and j <= 5:
-                                utility_red[3] += 1
-                            # non box
-                            else:
-                                utility_red[4] += 1
-                        elif i > 0:
-                            if j > 0 and j < 7:
-                                if self.board.matrix[i - 1][j - 1] != None and self.board.matrix[i - 1][j - 1].color == Color.BLUE and self.board.matrix[i + 1][j + 1] == None:
-                                    utility_red[5] += 1
-                                if self.board.matrix[i - 1][j + 1] != None and self.board.matrix[i - 1][j + 1].color == Color.BLUE and self.board.matrix[i + 1][j - 1] == None:
-                                    utility_red[5] += 1
-                        elif i < 7:
-                            if j == 0 or j == 7:
-                                utility_red[6] += 1
-                            elif (self.board.matrix[i + 1][j - 1] != None and (self.board.matrix[i + 1][j - 1].color == Color.RED or not self.board.matrix[i + 1][j - 1].is_king)) and self.board.matrix[i + 1][j + 1] != None and (self.board.matrix[i + 1][j + 1].color == Color.RED or not self.board.matrix[i + 1][j + 1].is_king):
-                                utility_red[6] += 1
+            if piece.color == Color.BLUE:
+                utility_blue += 1
+                if piece.is_king:
+                    utility_blue += 1
+                if self.turn == Color.BLUE and len(self.legal_attacks(piece)) != 0:
+                    utility_blue += 2
 
-                    if current_cell.color == Color.BLUE:
-                        if current_cell.is_king:
-                            # king
-                            utility_blue[1] += 1
-                        else:
-                            # pawn
-                            utility_blue[0] += 1
-
-                        if i == 0:
-                            # back row
-                            utility_blue[2] += 1
-                            utility_blue[6] += 1
-                        else:
-                            if i == 3 or i == 4:
-                                # mid box
-                                if j >= 2 and j <= 5:
-                                    utility_blue[3] += 1
-                                # non box
-                                else:
-                                    utility_blue[4] += 1
-                            if i < 7:
-                                if j > 0 and j < 7:
-                                    if self.board.matrix[i + 1][j - 1] != None and self.board.matrix[i + 1][j - 1].color == Color.RED and self.board.matrix[i - 1][j + 1] == None:
-                                        utility_blue[5] += 1
-                                    if self.board.matrix[i + 1][j + 1] != None and self.board.matrix[i + 1][j + 1].color == Color.RED and self.board.matrix[i - 1][j - 1] == None:
-                                        utility_blue[5] += 1
-                            if i > 0:
-                                if j == 0 or j == 7:
-                                    utility_blue[6] += 1
-                                elif (self.board.matrix[i - 1][j - 1] != None and (self.board.matrix[i - 1][j - 1].color == Color.RED or not self.board.matrix[i - 1][j - 1].is_king)) and self.board.matrix[i - 1][j + 1] != None and (self.board.matrix[i - 1][j + 1].color == Color.RED or not self.board.matrix[i - 1][j + 1].is_king):
-                                    utility_red[6] += 1
-
-        weight = [4, 8, 1, 2, 1.5, -3, 3]
-        sum = 0
-        for i in range(7):
-            if color == Color.RED:
-                utility_red[i] -= utility_blue[i]
-                sum += utility_red[i] * weight[i]
-            else:
-                utility_blue[i] -= utility_red[i]
-                sum += utility_blue[i] * weight[i]
-        return sum
+        if color == Color.BLUE:
+            return utility_blue - utility_red
+        else:
+            return utility_red - utility_blue

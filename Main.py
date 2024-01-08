@@ -90,7 +90,7 @@ if n_bots == 1:
             print()
             MAX, MIN = 1000, -1000
             state, new_v2 = minimax(
-                state, 0, True, MIN, MAX, red_bot_strength)
+                state, 0, True, MIN, MAX, red_bot_strength, state.turn)
             print_bot_move_details(state)
         check_end_game(state)
 
@@ -103,6 +103,6 @@ if n_bots == 2:
     state.print()
     while (True):
         state, new_v2 = minimax(
-            state, 0, True, MIN, MAX, red_bot_strength if state.turn == Color.RED else blue_bot_strength)
+            state, 0, True, MIN, MAX, red_bot_strength if state.turn == Color.RED else blue_bot_strength, state.turn)
         print_bot_move_details(state)
         check_end_game(state)
