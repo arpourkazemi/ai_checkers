@@ -1,5 +1,6 @@
 from state import State
 from Color import Color
+from typing import List
 import random
 MAX, MIN = 1000, -1000
 BRANCHING_FACTOR = 4
@@ -9,11 +10,16 @@ def get_heuristic(element: 'State'):
     return element.heuristic(element.turn)
 
 
-def minimax(state: 'State', depth, maximizing_player, alpha, beta, strength, color):
-    successors = state.successor()
+def forward_pruning(successors: List['State']):
     if len(successors) > BRANCHING_FACTOR:
         successors.sort(key=get_heuristic)
         successors = successors[:BRANCHING_FACTOR]
+    return successors
+
+
+def minimax(state: 'State', depth, maximizing_player, alpha, beta, strength, color):
+    successors = state.successor()
+    successors = forward_pruning(successors)
     if depth == strength:
         return state, state.heuristic(color)
 
