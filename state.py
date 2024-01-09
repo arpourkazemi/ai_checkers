@@ -44,7 +44,7 @@ class State:
                     else:
                         print("     \033[0m", end="")
                 print("")
-        print(end="\n\n")
+        print(end="\n")
 
     def legal_moves(self, piece: 'Piece'):
         legal_moves = list()

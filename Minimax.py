@@ -1,5 +1,4 @@
 from state import State
-from Color import Color
 from typing import List
 import random
 MAX, MIN = 1000, -1000
