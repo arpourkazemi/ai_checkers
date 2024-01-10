@@ -18,7 +18,7 @@ def forward_pruning(successors: List['State']):
 
 def minimax(state: 'State', depth, maximizing_player, alpha, beta, strength, color):
     successors = state.successor()
-    successors = forward_pruning(successors)
+    # successors = forward_pruning(successors)
     if depth == strength:
         return state, state.heuristic(color)
 
